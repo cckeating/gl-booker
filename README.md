@@ -9,7 +9,7 @@ Personally I like to go to the gym early in the morning so I made this bot to bo
 ### Notes
 This is a node.js program that gets run once. Currently I use it with cron jobs to schedule the program to be run at midnight every night. 
 
-### Features and Improvments
+### Features and Improvements
 - [x] Books a session for my specific times on weekdays and weekends at a specific location.
 - [ ] Allow user to select gym location
 - [ ] Allow user to select different times for each day
