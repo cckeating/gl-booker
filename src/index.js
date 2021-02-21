@@ -105,7 +105,7 @@ const main = async () => {
     throw new Error("EMAIL and PASSWORD must be set in credentials.json file");
   }
 
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({ headless: true });
 
   try {
     // Set geolocation details
