@@ -2,8 +2,12 @@ const puppeteer = require("puppeteer");
 
 const { EMAIL, PASSWORD } = require("../credentials.json");
 
+const LOGIN_URL = "https://www.goodlifefitness.com/Goodlifelogin.html";
+const BOOK_WORKOUT_URL =
+  "https://www.goodlifefitness.com/book-workout.html#no-redirect";
+
 const login = async (page) => {
-  await page.goto("https://www.goodlifefitness.com/Goodlifelogin.html", {
+  await page.goto(LOGIN_URL, {
     waitUntil: "networkidle0",
   });
 
@@ -64,7 +68,7 @@ const bookWorkout = async (workoutsPage) => {
   if (bookWeekendSession) {
     // Click on 1st time (7:00 AM) on weekend
     await workoutsPage.click(
-      "#day-number-7 > li:nth-child(2) > div.col-md-12.col-lg-10 > div > div.col-4.c-schedule-calendar__cta-container > div.js-class-action-container > button"
+      "#day-number-7 > li:nth-child(1) > div.col-md-12.col-lg-10 > div > div.col-4.c-schedule-calendar__cta-container > div.js-class-action-container > button"
     );
   } else {
     // Click on 2nd time (6:00 AM) on weekday
@@ -82,10 +86,12 @@ const bookWorkout = async (workoutsPage) => {
   // Click on 'I agree with goodlife standards' select
   await workoutsPage.click("#js-workout-booking-agreement-input");
 
+  // Click confirm button
   await workoutsPage.click(
     "#class-modal-container > div.c-modal__footer.js-class-action-container.js-class-api-message-container > div > button.c-btn-cta.c-btn-cta--chevron.modal-class-action.js-terms-agreement-cta"
   );
 
+  // Wait some time for request to be made (Maybe not needed). Also wait for confirmed message that has a cancel button.
   await workoutsPage.waitForTimeout(1000 * 6);
   await workoutsPage.waitForSelector(
     "#js-classes-schedule > div:nth-child(4) > div.c-modal.c-schedule-calendar__class-details-modal.js-class-modal.u-transition-visible > div > div.modal-submition-close.js-class-action-modal-submition-close.u-is-block > button"
@@ -95,34 +101,35 @@ const bookWorkout = async (workoutsPage) => {
 };
 
 const main = async () => {
-  const browser = await puppeteer.launch({ headless: true });
+  if (!EMAIL || !PASSWORD) {
+    throw new Error("EMAIL and PASSWORD must be set in credentials.json file");
+  }
 
-  const context = browser.defaultBrowserContext();
-  await context.overridePermissions(
-    "https://www.goodlifefitness.com/member-details.html",
-    ["geolocation"]
-  );
+  const browser = await puppeteer.launch({ headless: false });
 
-  const page = await browser.newPage();
+  try {
+    // Set geolocation details
+    const context = browser.defaultBrowserContext();
+    await context.overridePermissions(
+      "https://www.goodlifefitness.com/member-details.html",
+      ["geolocation"]
+    );
 
-  page.setDefaultTimeout(1000 * 120); // 120 second timeout, login wait times at midnight can take some time...
+    const page = await browser.newPage();
 
-  await login(page);
+    page.setDefaultTimeout(1000 * 120); // 120 second timeout, login wait times at midnight can take some time...
 
-  // Go to book workout page
-  await page.goto(
-    "https://www.goodlifefitness.com/book-workout.html#no-redirect",
-    { waitUntil: "networkidle0" }
-  );
+    await login(page);
 
-  await bookWorkout(page);
+    // Go to book workout page
+    await page.goto(BOOK_WORKOUT_URL, { waitUntil: "networkidle0" });
 
-  // Move this outside so that program doesnt hang if it errors out
+    await bookWorkout(page);
+  } catch (err) {
+    console.error(err);
+  }
+
   await browser.close();
 };
 
-try {
-  main();
-} catch (err) {
-  console.err(err);
-}
+main();
