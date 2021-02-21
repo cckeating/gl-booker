@@ -1,6 +1,6 @@
 # gl-booker
 
-A bot that books goodlife gym sessions at a specific time using Puppeteer. 
+A bot that books gym sessions at a specific time using Puppeteer. 
 
 ### Motivation
 Having to wake up or stay up until midnight to book a session can be an annoyance and mess up a good sleep schedule. 
