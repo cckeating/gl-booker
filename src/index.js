@@ -105,31 +105,44 @@ const main = async () => {
     throw new Error("EMAIL and PASSWORD must be set in credentials.json file");
   }
 
-  const browser = await puppeteer.launch({ headless: true });
+  console.log("gl-booker starting...");
 
-  try {
-    // Set geolocation details
-    const context = browser.defaultBrowserContext();
-    await context.overridePermissions(
-      "https://www.goodlifefitness.com/member-details.html",
-      ["geolocation"]
-    );
+  let retryCount = 0;
 
-    const page = await browser.newPage();
+  while (retryCount < 5) {
+    const browser = await puppeteer.launch({ headless: true });
+    try {
+      // Set geolocation details
+      const context = browser.defaultBrowserContext();
+      await context.overridePermissions(
+        "https://www.goodlifefitness.com/member-details.html",
+        ["geolocation"]
+      );
 
-    page.setDefaultTimeout(1000 * 120); // 120 second timeout, login wait times at midnight can take some time...
+      const page = await browser.newPage();
 
-    await login(page);
+      page.setDefaultTimeout(1000 * 120); // 120 second timeout, login wait times at midnight can take some time...
 
-    // Go to book workout page
-    await page.goto(BOOK_WORKOUT_URL, { waitUntil: "networkidle0" });
+      await login(page);
 
-    await bookWorkout(page);
-  } catch (err) {
-    console.error(err);
+      // Go to book workout page
+      await page.goto(BOOK_WORKOUT_URL, { waitUntil: "networkidle0" });
+
+      await bookWorkout(page);
+    } catch (err) {
+      console.error(err);
+
+      console.log("Retrying in 1 minute...");
+      await new Promise((resolve) => setTimeout(resolve, 1000 * 60));
+      retryCount++;
+      await browser.close();
+      continue;
+    }
+
+    await browser.close();
+
+    break;
   }
-
-  await browser.close();
 };
 
 main();
