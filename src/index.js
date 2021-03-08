@@ -54,9 +54,9 @@ const bookWorkout = async (workoutsPage) => {
     { visible: true }
   );
 
-  // Go 7 days ahead
+  // Go 3 days ahead
   await workoutsPage.click(
-    "#js-class-schedule-weekdays-container > li:nth-child(7)"
+    "#js-class-schedule-weekdays-container > li:nth-child(4)"
   );
 
   const todaysDate = new Date();
@@ -68,12 +68,12 @@ const bookWorkout = async (workoutsPage) => {
   if (bookWeekendSession) {
     // Click on 1st time (7:00 AM) on weekend
     await workoutsPage.click(
-      "#day-number-7 > li:nth-child(1) > div.col-md-12.col-lg-10 > div > div.col-4.c-schedule-calendar__cta-container > div.js-class-action-container > button"
+      "#day-number-4 > li:nth-child(2) > div.col-md-12.col-lg-10 > div > div.col-4.c-schedule-calendar__cta-container > div.js-class-action-container > button"
     );
   } else {
     // Click on 2nd time (6:00 AM) on weekday
     await workoutsPage.click(
-      "#day-number-7 > li:nth-child(2) > div.col-md-12.col-lg-10 > div > div.col-4.c-schedule-calendar__cta-container > div.js-class-action-container > button"
+      "#day-number-4 > li:nth-child(2) > div.col-md-12.col-lg-10 > div > div.col-4.c-schedule-calendar__cta-container > div.js-class-action-container > button"
     );
   }
 
